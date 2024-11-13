@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { transcribeFile } from "../../../lib/stt/transcribe";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const userId = request.headers.get("x-authenticated-user-id");
+    console.log("userId", userId);
     const audioBuffer = await request.arrayBuffer();
     const buffer = Buffer.from(audioBuffer);
 

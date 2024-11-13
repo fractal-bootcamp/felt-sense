@@ -116,7 +116,7 @@ export default function SpeakArea() {
     return (
         <div className="flex flex-col gap-4 p-4 mt-auto">
             {conversationState === "listening" ? <div className="flex gap-2">
-                {volumeLevels.slice(5, 15).map((level, index) => (
+                {volumeLevels.slice(7, 15).map((level, index) => (
                     <div
                         key={index}
                         className="bg-gray-300"

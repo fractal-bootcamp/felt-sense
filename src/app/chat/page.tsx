@@ -6,6 +6,7 @@ import SpeakArea from "../components/SpeakArea";
 // This is now a Server Component (no "use client" directive)
 export default async function ChatPage() {
   const { user } = await withAuth();
+
   return (
     <div>
       <div className="flex items-center justify-center m-4">

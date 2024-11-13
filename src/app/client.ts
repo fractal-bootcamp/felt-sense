@@ -1,5 +1,4 @@
 "use client";
-import axios from "axios";
 
 export const sendAudioStream = async (readable: ReadableStream) => {
   // Convert ReadableStream to Blob
@@ -17,6 +16,7 @@ export const sendAudioStream = async (readable: ReadableStream) => {
   const response = await fetch("/api/stt", {
     method: "POST",
     body: blob,
+    credentials: "include", // Properly add withCredentials:true
   });
   return response.json();
 };

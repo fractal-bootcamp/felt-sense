@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
     "@deepgram/sdk": "^3.9.0",
     "@picovoice/orca-node": "^1.0.0",
     "@prisma/client": "^5.22.0",

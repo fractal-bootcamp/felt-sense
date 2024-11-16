@@ -2,17 +2,10 @@ import { withAuth } from '@workos-inc/authkit-nextjs';
 import Heart from "../components/Heart";
 import SpeakArea from "../components/SpeakArea";
 
-const DisplayMessages = () => {
-  return (
-    <div className="flex flex-col items-center justify-center">
-      DisplayMessages
-    </div>
-  )
-};
-
-
 export default async function ChatPage() {
   const { user } = await withAuth();
+  // 
+
   return (
     <div>
       <div className="flex items-center justify-center m-4">
@@ -22,7 +15,6 @@ export default async function ChatPage() {
           </span>
         </div>
       </div>
-      <DisplayMessages />
       <div>
         <div className="flex absolute top-1/2 left-1/2 max-sm:bottom-0 max-sm:left-1/2 w-[60%] h-[50%] sm:w-[40%] sm:h-[50%] bg-white rounded-lg transform -translate-x-1/2 sm:-translate-y-28  shadow-lg opacity-75">
           <div className="flex flex-col items-center justify-center self-end mx-auto h-full relative">

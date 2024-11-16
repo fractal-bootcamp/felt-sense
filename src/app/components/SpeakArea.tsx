@@ -151,7 +151,7 @@ export default function SpeakArea() {
         // create a new conversation
         console.log("Creating new conversation for user: ", userId);
 
-        const conversation = await createNewConversation(userId);
+        const conversation = await createNewConversation();
 
         setConversationId(conversation.id);
         console.log("Conversation created with id: ", conversation.id);

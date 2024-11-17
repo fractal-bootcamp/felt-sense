@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { getSession } from "@workos-inc/authkit-nextjs";
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
-    const { userId } = await request.json();
+    const session = await getSession();
+    const userId = session?.user.id;
     console.log("Creating new conversation for user:", userId);
     const conversation = await prisma.conversation.create({
       data: {

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { conversationQueries, messageQueries } from "../../../lib/db/queries";
-import { getSession } from "@workos-inc/authkit-nextjs";
+import { getSession, refreshSession } from "@workos-inc/authkit-nextjs";
+import type { UserInfo } from "@/types/index"
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -11,11 +12,21 @@ export async function POST(request: Request) {
   // add new messsage to database
   try {
     const session = await getSession();
-    const userId = session?.user?.id;
+    let userId = session?.user?.id;
+    console.log("userId", userId);
+
+    // If initial session check fails, try to refresh
     if (!userId) {
-      console.error("User ID not found");
-      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
+      console.log("No user ID found, trying to refresh session");
+      try {
+        const refreshedSession: UserInfo = await refreshSession({ ensureSignedIn: true });
+        userId = refreshedSession.user.id;
+      } catch (refreshError) {
+        console.error("Session refresh failed:", refreshError);
+        return NextResponse.json({ error: "Session expired" }, { status: 401 });
+      }
     }
+
     const { conversationId } = await request.json();
     const conversation = await conversationQueries.getConversation(
       userId,
@@ -64,9 +75,9 @@ export async function POST(request: Request) {
       response: responseContent,
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("LLM API error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.message },
       { status: 500 }
     );
   }

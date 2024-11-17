@@ -28,11 +28,26 @@ export const transcribeAudioStream = async (
 };
 
 export const callLLM = async (conversationId: string) => {
-  const response = await fetch("/api/LLM", {
-    method: "POST",
-    body: JSON.stringify({ conversationId }),
-  });
-  return response.json();
+  try {
+    const response = await fetch("/api/LLM", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // The middleware will automatically add the session header
+      },
+      body: JSON.stringify({ conversationId }),
+      credentials: 'same-origin' // Important for cookie handling
+    });
+
+    if (!response.ok) {
+      throw new Error(`API call failed: ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("LLM call failed:", error);
+    throw error;
+  }
 };
 
 export const speakText = async (text: string) => {

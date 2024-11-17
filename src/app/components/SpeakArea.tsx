@@ -3,10 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { transcribeAudioStream, speakText, callLLM } from "@/lib/api/SendAudioStream";
 import { useChatStore } from "@/app/store/chat";
-import { withAuth } from '@workos-inc/authkit-nextjs';
 import { createNewConversation } from "@/lib/api/newConversation";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 
-// TODO: include conversationId as a parameter in the SpeakArea component
 export default function SpeakArea() {
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -15,24 +14,25 @@ export default function SpeakArea() {
     const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
     const { conversationState, setConversationState, conversationId, setConversationId } = useChatStore();
     const [showModal, setShowModal] = useState(true);
-    const [userId, setUserId] = useState<string | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const { user } = await withAuth();
-            console.log("Auth user:", user);
-            if (!user) {
-                throw new Error("User not found");
+        const checkAuth = async () => {
+            try {
+                const session = await withAuth({ ensureSignedIn: true });
+                setIsAuthenticated(!!session.user);
+            } catch (error) {
+                console.error("Auth check failed:", error);
+                // Will automatically redirect to sign-in
             }
-            setUserId(user.id);
         };
 
-        fetchUser();
+        checkAuth();
     }, []);
 
     useEffect(() => {
         // Only initialize if conversationId
-        if (conversationId) {
+        if (conversationId && isAuthenticated) {
             const initMediaRecorder = async () => {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -71,7 +71,7 @@ export default function SpeakArea() {
                 audioContext.close();
             }
         };
-    }, [conversationId]);
+    }, [conversationId, isAuthenticated]);
 
     /// For audio animation
     useEffect(() => {
@@ -145,13 +145,9 @@ export default function SpeakArea() {
     }, [isRecording]);
 
     const handleStartSession = async () => {
-        if (!userId) {
-            return;
-        }
         // create a new conversation
-        console.log("Creating new conversation for user: ", userId);
 
-        const conversation = await createNewConversation(userId);
+        const conversation = await createNewConversation();
 
         setConversationId(conversation.id);
         console.log("Conversation created with id: ", conversation.id);
